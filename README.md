@@ -50,7 +50,7 @@ Or just open `index.html` directly in your browser.
 
 1. Fork the repo
 2. Go to Settings → Pages → deploy from `main`
-3. It'll be live at `https://YOURUSERNAME.github.io/pdfbox`
+3. It'll be live at `https://ManuCovr.github.io/pdfbox`
 
 ## License
 
