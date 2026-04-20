@@ -16,7 +16,7 @@ No uploads. Everything runs in the browser using [pdf-lib](https://pdf-lib.js.or
 
 Open the site, drop your PDF in, done.
 
-Live site: `https://YOURUSERNAME.github.io/pdfbox`
+Live site: `https://ManuCovr.github.io/pdfbox`
 
 ### Page extraction
 
