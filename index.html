@@ -12,6 +12,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2.5rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
 .logo{font-family:var(--serif);font-size:1.5rem;font-weight:600;color:var(--accent);letter-spacing:-.02em}
 .logo span{color:var(--text)}
+.logo-group{display:flex;align-items:baseline;gap:.6rem}
+.visit-count{font-size:.62rem;color:var(--muted);letter-spacing:.05em;opacity:.65;white-space:nowrap}
 .nav-tag{font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
 .hero{padding:5rem 2.5rem 3rem;max-width:960px;margin:0 auto}
 .hero-label{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem}
@@ -28,7 +30,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 .drop-zone{border:1.5px dashed var(--border2);border-radius:var(--radius);padding:3.5rem 2rem;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative}
 .drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(212,240,124,.04)}
 .drop-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.drop-icon{font-size:2.5rem;margin-bottom:1rem;display:block}
+.drop-icon{font-size:2.5rem;margin-bottom:1rem;display:block;line-height:1}
 .drop-title{font-family:var(--serif);font-size:1.25rem;font-weight:300;color:var(--text);margin-bottom:.4rem}
 .drop-sub{font-size:.75rem;color:var(--muted)}
 .file-list{margin-top:1.25rem;display:flex;flex-direction:column;gap:8px}
@@ -70,10 +72,24 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;hei
 .sub-panel{display:none}
 .sub-panel.active{display:block}
 .img-result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:1rem}
-.img-result-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;text-align:center}
-.img-result-item img{width:100%;display:block}
-.img-result-item a{display:block;font-size:.65rem;color:var(--muted);padding:6px;text-decoration:none;transition:color .15s}
-.img-result-item a:hover{color:var(--accent)}
+.img-result-item{background:var(--surface);border:1.5px solid var(--border);border-radius:8px;overflow:hidden;text-align:center;position:relative;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.img-result-item.selected{border-color:var(--accent);box-shadow:0 0 0 2px rgba(212,240,124,.2)}
+.img-result-item img{width:100%;display:block;pointer-events:none}
+.img-result-item .img-dl-link{display:block;font-size:.65rem;color:var(--muted);padding:6px;text-decoration:none;transition:color .15s}
+.img-result-item .img-dl-link:hover{color:var(--accent)}
+.img-check-wrap{position:absolute;top:6px;left:6px;z-index:2;pointer-events:none}
+.img-check-wrap input[type="checkbox"]{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;pointer-events:all;display:block}
+.p2i-toolbar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:.75rem;padding:.65rem .85rem;background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.p2i-toolbar-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;padding:.38rem .8rem;border-radius:6px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.p2i-toolbar-btn:hover{color:var(--text);border-color:var(--border2)}
+.p2i-toolbar-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(212,240,124,.06)}
+.fmt-group{display:flex;gap:2px;background:var(--surface2);border-radius:6px;padding:2px;border:1px solid var(--border)}
+.fmt-btn{background:none;border:none;color:var(--muted);font-family:var(--mono);font-size:.7rem;padding:.3rem .65rem;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.fmt-btn.active{background:var(--accent);color:#0e0e0e;font-weight:500}
+.p2i-dl-sel{background:var(--accent);color:#0e0e0e;border:none;font-family:var(--mono);font-size:.72rem;font-weight:500;padding:.38rem .9rem;border-radius:6px;cursor:pointer;transition:background .15s;white-space:nowrap}
+.p2i-dl-sel:hover{background:var(--accent-dark)}
+.p2i-dl-sel:disabled{opacity:.4;cursor:not-allowed}
+.p2i-sel-info{font-size:.7rem;color:var(--muted);margin-left:auto}
 .info-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:2.5rem;padding-top:2.5rem;border-top:1px solid var(--border)}
 .info-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
 .info-card .ic-num{font-family:var(--serif);font-size:2rem;font-weight:300;color:var(--accent);line-height:1;margin-bottom:.5rem}
@@ -82,12 +98,52 @@ footer{border-top:1px solid var(--border);padding:1.5rem 2.5rem;display:flex;ali
 footer a{color:var(--muted);text-decoration:none}
 footer a:hover{color:var(--accent)}
 @media(max-width:600px){nav,.hero,.tabs,.panels,footer{padding-left:1.25rem;padding-right:1.25rem}.hero{padding-top:3rem}}
+
+/* ── Skeleton ──────────────────────────────────────────────────────────── */
+#page-skeleton{position:fixed;inset:0;background:var(--bg);z-index:9999;opacity:1;transition:opacity .45s ease;overflow:hidden}
+#page-skeleton.hide{opacity:0;pointer-events:none}
+.skel-nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2.5rem;border-bottom:1px solid var(--border);margin-bottom:0}
+.skel-body{max-width:960px;margin:0 auto;padding:4rem 2.5rem 0}
+.skel-block{background:var(--surface2);border-radius:6px;animation:skel-pulse 1.7s ease-in-out infinite}
+@keyframes skel-pulse{0%,100%{opacity:.35}55%{opacity:.85}}
+.skel-tabs-row{display:flex;gap:8px;padding:0 2.5rem;margin-top:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.skel-panels{max-width:960px;margin:0 auto;padding:2rem 2.5rem 0}
 </style>
 </head>
 <body>
 
+<!-- ── Skeleton overlay ─────────────────────────────────────────────────────── -->
+<div id="page-skeleton">
+  <div class="skel-nav">
+    <div class="skel-block" style="height:1.5rem;width:100px"></div>
+    <div class="skel-block" style="height:.7rem;width:240px"></div>
+  </div>
+  <div class="skel-body">
+    <div class="skel-block" style="height:.6rem;width:70px;margin-bottom:1.1rem"></div>
+    <div class="skel-block" style="height:3.2rem;width:58%;margin-bottom:.9rem"></div>
+    <div class="skel-block" style="height:2.4rem;width:40%;margin-bottom:1rem"></div>
+    <div class="skel-block" style="height:.75rem;width:320px;margin-bottom:.5rem"></div>
+    <div class="skel-block" style="height:.75rem;width:260px"></div>
+  </div>
+  <div class="skel-tabs-row">
+    <div class="skel-block" style="height:.7rem;width:90px"></div>
+    <div class="skel-block" style="height:.7rem;width:80px"></div>
+    <div class="skel-block" style="height:.7rem;width:70px"></div>
+    <div class="skel-block" style="height:.7rem;width:90px"></div>
+  </div>
+  <div class="skel-panels">
+    <div class="skel-block" style="height:160px;width:100%;border-radius:12px;margin-bottom:1rem"></div>
+    <div class="skel-block" style="height:.75rem;width:180px;margin-bottom:.6rem"></div>
+    <div class="skel-block" style="height:.75rem;width:220px;margin-bottom:1.2rem"></div>
+    <div class="skel-block" style="height:2.5rem;width:150px;border-radius:8px"></div>
+  </div>
+</div>
+
 <nav>
-  <div class="logo">PDF<span>box</span></div>
+  <div class="logo-group">
+    <div class="logo">PDF<span>box</span></div>
+    <span class="visit-count" id="visit-counter"></span>
+  </div>
   <div class="nav-tag">100% client-side · no uploads · open source</div>
 </nav>
 
@@ -98,31 +154,31 @@ footer a:hover{color:var(--accent)}
 </div>
 
 <div class="tabs">
-  <button class="tab-btn active" data-tab="split">✂ Extract Pages</button>
-  <button class="tab-btn" data-tab="compress">◈ Compress</button>
-  <button class="tab-btn" data-tab="merge">⊕ Merge</button>
-  <button class="tab-btn" data-tab="convert">⇄ Converters</button>
+  <button class="tab-btn active" data-tab="split">&#9988; Extract Pages</button>
+  <button class="tab-btn" data-tab="compress">&#9672; Compress</button>
+  <button class="tab-btn" data-tab="merge">&#8853; Merge</button>
+  <button class="tab-btn" data-tab="convert">&#8644; Converters</button>
 </div>
 
 <div class="panels">
 
   <!-- EXTRACT -->
   <div class="panel active" id="tab-split">
-    <div class="drop-zone" id="split-drop"><input type="file" accept=".pdf" id="split-input"><span class="drop-icon">✂</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse · single file</p></div>
+    <div class="drop-zone" id="split-drop"><input type="file" accept=".pdf" id="split-input"><span class="drop-icon">&#9988;</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse &middot; single file</p></div>
     <div class="file-list" id="split-list"></div>
     <div class="controls">
       <div class="control-row"><label class="ctrl-label">Pages</label><input type="text" id="split-pages" placeholder="e.g. 2, 1-3, 5, 7-9"></div>
-      <div class="control-row" style="font-size:.72rem;color:var(--muted);">Enter page numbers or ranges — e.g. 2 or 1-3, 5, 7-9</div>
+      <div class="control-row" style="font-size:.72rem;color:var(--muted);">Enter page numbers or ranges &mdash; e.g. 2 or 1-3, 5, 7-9</div>
       <div class="control-row"><label class="ctrl-label">Output name</label><input type="text" id="split-name" value="extracted.pdf"></div>
     </div>
     <button class="action-btn" id="split-btn" disabled>Extract Pages</button>
     <div class="progress-wrap" id="split-progress"><div class="progress-bar-bg"><div class="progress-bar" id="split-bar"></div></div><p class="progress-label" id="split-progress-label"></p></div>
-    <div class="result-box" id="split-result"><div class="result-info"><strong>Extraction complete</strong><span id="split-result-info"></span></div><a class="download-btn" id="split-download">↓ Download</a></div>
+    <div class="result-box" id="split-result"><div class="result-info"><strong>Extraction complete</strong><span id="split-result-info"></span></div><a class="download-btn" id="split-download">&#8595; Download</a></div>
   </div>
 
   <!-- COMPRESS -->
   <div class="panel" id="tab-compress">
-    <div class="drop-zone" id="compress-drop"><input type="file" accept=".pdf" id="compress-input"><span class="drop-icon">◈</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse · single file</p></div>
+    <div class="drop-zone" id="compress-drop"><input type="file" accept=".pdf" id="compress-input"><span class="drop-icon">&#9672;</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse &middot; single file</p></div>
     <div class="file-list" id="compress-list"></div>
     <div class="controls">
       <div class="control-row"><label class="ctrl-label">Quality</label><input type="range" id="compress-quality" min="0" max="100" value="75" step="1"><span class="range-val" id="compress-quality-val">75%</span></div>
@@ -131,29 +187,29 @@ footer a:hover{color:var(--accent)}
     </div>
     <button class="action-btn" id="compress-btn" disabled>Compress PDF</button>
     <div class="progress-wrap" id="compress-progress"><div class="progress-bar-bg"><div class="progress-bar" id="compress-bar"></div></div><p class="progress-label" id="compress-progress-label"></p></div>
-    <div class="result-box" id="compress-result"><div class="result-info"><strong>Compression complete</strong><span id="compress-result-info"></span></div><a class="download-btn" id="compress-download">↓ Download</a></div>
+    <div class="result-box" id="compress-result"><div class="result-info"><strong>Compression complete</strong><span id="compress-result-info"></span></div><a class="download-btn" id="compress-download">&#8595; Download</a></div>
   </div>
 
   <!-- MERGE -->
   <div class="panel" id="tab-merge">
-    <div class="drop-zone" id="merge-drop"><input type="file" accept=".pdf" multiple id="merge-input"><span class="drop-icon">📄</span><p class="drop-title">Drop PDFs here</p><p class="drop-sub">or click to browse · multiple files supported</p></div>
+    <div class="drop-zone" id="merge-drop"><input type="file" accept=".pdf" multiple id="merge-input"><span class="drop-icon">&#8853;</span><p class="drop-title">Drop PDFs here</p><p class="drop-sub">or click to browse &middot; multiple files supported</p></div>
     <div class="file-list" id="merge-list"></div>
     <div class="controls">
       <div class="control-row"><label class="ctrl-label">Output name</label><input type="text" id="merge-name" value="merged.pdf"></div>
     </div>
     <button class="action-btn" id="merge-btn" disabled>Merge PDFs</button>
     <div class="progress-wrap" id="merge-progress"><div class="progress-bar-bg"><div class="progress-bar" id="merge-bar"></div></div><p class="progress-label" id="merge-progress-label"></p></div>
-    <div class="result-box" id="merge-result"><div class="result-info"><strong>Merge complete</strong><span id="merge-result-info"></span></div><a class="download-btn" id="merge-download">↓ Download</a></div>
+    <div class="result-box" id="merge-result"><div class="result-info"><strong>Merge complete</strong><span id="merge-result-info"></span></div><a class="download-btn" id="merge-download">&#8595; Download</a></div>
   </div>
 
   <!-- CONVERTERS -->
   <div class="panel" id="tab-convert">
     <div class="sub-tabs">
-      <button class="sub-tab-btn active" data-sub="pdf2img">PDF → Images</button>
-      <button class="sub-tab-btn" data-sub="img2pdf">Images → PDF</button>
+      <button class="sub-tab-btn active" data-sub="pdf2img">PDF &rarr; Images</button>
+      <button class="sub-tab-btn" data-sub="img2pdf">Images &rarr; PDF</button>
     </div>
     <div class="sub-panel active" id="sub-pdf2img">
-      <div class="drop-zone" id="p2i-drop"><input type="file" accept=".pdf" id="p2i-input"><span class="drop-icon">🖼</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse · exports each page as PNG</p></div>
+      <div class="drop-zone" id="p2i-drop"><input type="file" accept=".pdf" id="p2i-input"><span class="drop-icon">&#9638;</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse &middot; exports each page as PNG</p></div>
       <div class="file-list" id="p2i-file-list"></div>
       <div class="controls">
         <div class="control-row"><label class="ctrl-label">Scale</label><input type="range" id="p2i-scale" min="1" max="4" value="2" step="0.5"><span class="range-val" id="p2i-scale-val">2x</span></div>
@@ -164,7 +220,7 @@ footer a:hover{color:var(--accent)}
       <div id="p2i-results"></div>
     </div>
     <div class="sub-panel" id="sub-img2pdf">
-      <div class="drop-zone" id="i2p-drop"><input type="file" accept="image/jpeg,image/png,image/webp" multiple id="i2p-input"><span class="drop-icon">📄</span><p class="drop-title">Drop images here</p><p class="drop-sub">or click to browse · JPG, PNG and WebP · multiple files</p></div>
+      <div class="drop-zone" id="i2p-drop"><input type="file" accept="image/jpeg,image/png,image/webp" multiple id="i2p-input"><span class="drop-icon">&#9646;</span><p class="drop-title">Drop images here</p><p class="drop-sub">or click to browse &middot; JPG, PNG and WebP &middot; multiple files</p></div>
       <div class="file-list" id="i2p-list"></div>
       <div class="controls">
         <div class="control-row"><label class="ctrl-label">Page size</label>
@@ -174,27 +230,46 @@ footer a:hover{color:var(--accent)}
       </div>
       <button class="action-btn" id="i2p-btn" disabled>Convert to PDF</button>
       <div class="progress-wrap" id="i2p-progress"><div class="progress-bar-bg"><div class="progress-bar" id="i2p-bar"></div></div><p class="progress-label" id="i2p-progress-label"></p></div>
-      <div class="result-box" id="i2p-result"><div class="result-info"><strong>PDF created</strong><span id="i2p-result-info"></span></div><a class="download-btn" id="i2p-download">↓ Download</a></div>
+      <div class="result-box" id="i2p-result"><div class="result-info"><strong>PDF created</strong><span id="i2p-result-info"></span></div><a class="download-btn" id="i2p-download">&#8595; Download</a></div>
     </div>
   </div>
 
   <div class="info-row">
     <div class="info-card"><div class="ic-num">0</div><p>Files uploaded to any server. Everything runs in your browser using WebAssembly.</p></div>
-    <div class="info-card"><div class="ic-num">∞</div><p>Files you can process. No accounts, no limits, no watermarks. Ever.</p></div>
+    <div class="info-card"><div class="ic-num">&infin;</div><p>Files you can process. No accounts, no limits, no watermarks. Ever.</p></div>
     <div class="info-card"><div class="ic-num">OS</div><p>Open source on GitHub. Audit the code, fork it, contribute, or self-host it.</p></div>
   </div>
 </div>
 
 <footer>
-  <span>PDFbox — free forever</span>
-  <a href="https://github.com/ManuCovr/pdfbox" target="_blank">GitHub ↗</a>
+  <span>PDFbox &mdash; free forever</span>
+  <a href="https://github.com/ManuCovr/pdfbox" target="_blank">GitHub &nearr;</a>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
-// pdf.js worker — set before any document is loaded
+// pdf.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc='./pdf.worker.min.js';
+
+// ── Skeleton ──────────────────────────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  const sk=document.getElementById('page-skeleton');
+  sk.classList.add('hide');
+  setTimeout(()=>{if(sk.parentNode)sk.parentNode.removeChild(sk);},500);
+});
+
+// ── Visit counter ─────────────────────────────────────────────────────────────
+(function(){
+  try{
+    const key='pdfbox_visits';
+    const n=(parseInt(localStorage.getItem(key)||'0'))+1;
+    localStorage.setItem(key,n);
+    const el=document.getElementById('visit-counter');
+    if(el)el.textContent=n.toLocaleString()+' visit'+(n===1?'':'s');
+  }catch(e){}
+})();
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -253,18 +328,19 @@ function parsePageRanges(str,total){
   return[...s].sort((a,b)=>a-b);
 }
 document.getElementById('split-btn').addEventListener('click',async()=>{
+  if(!splitFile)return;
   const btn=document.getElementById('split-btn');btn.disabled=true;
-  setProgress('split',10,'Loading PDF…');
+  setProgress('split',10,'Loading PDF\u2026');
   try{
     const srcDoc=await PDFLib.PDFDocument.load(await readFile(splitFile));
     const indices=parsePageRanges(document.getElementById('split-pages').value,srcDoc.getPageCount());
-    setProgress('split',60,'Extracting pages…');
+    setProgress('split',60,'Extracting pages\u2026');
     const newDoc=await PDFLib.PDFDocument.create();
     const pages=await newDoc.copyPages(srcDoc,indices);
     pages.forEach(p=>newDoc.addPage(p));
     const bytes=await newDoc.save();
     setProgress('split',100,'Done!');
-    showResult('split',`${indices.length} pages · ${fmtSize(bytes.length)}`,bytes,document.getElementById('split-name').value||'extracted.pdf');
+    showResult('split',`${indices.length} pages \xb7 ${fmtSize(bytes.length)}`,bytes,document.getElementById('split-name').value||'extracted.pdf');
   }catch(e){setProgress('split',100,'Error: '+e.message);}
   btn.disabled=false;
 });
@@ -280,16 +356,17 @@ setupDrop('compress-drop','compress-input','pdf',files=>{
   document.getElementById('compress-progress').classList.remove('show');
 });
 document.getElementById('compress-btn').addEventListener('click',async()=>{
+  if(!compressFile)return;
   const btn=document.getElementById('compress-btn');btn.disabled=true;
-  setProgress('compress',10,'Loading PDF…');
+  setProgress('compress',10,'Loading PDF\u2026');
   try{
     const doc=await PDFLib.PDFDocument.load(await readFile(compressFile),{updateMetadata:false});
     doc.setTitle('');doc.setAuthor('');doc.setSubject('');doc.setKeywords([]);doc.setProducer('PDFbox');doc.setCreator('PDFbox');
-    setProgress('compress',75,'Saving…');
+    setProgress('compress',75,'Saving\u2026');
     const bytes=await doc.save({useObjectStreams:true,addDefaultPage:false,objectsPerTick:20});
     setProgress('compress',100,'Done!');
     const orig=compressFile.size;const ratio=((1-bytes.length/orig)*100).toFixed(1);
-    const info=ratio>0?`${fmtSize(orig)} → ${fmtSize(bytes.length)} (${ratio}% smaller)`:`${fmtSize(bytes.length)} (metadata stripped)`;
+    const info=ratio>0?`${fmtSize(orig)} \u2192 ${fmtSize(bytes.length)} (${ratio}% smaller)`:`${fmtSize(bytes.length)} (metadata stripped)`;
     showResult('compress',info,bytes,document.getElementById('compress-name').value||'compressed.pdf');
   }catch(e){setProgress('compress',100,'Error: '+e.message);}
   btn.disabled=false;
@@ -302,7 +379,7 @@ function renderMergeList(){
   const list=document.getElementById('merge-list');list.innerHTML='';
   mergeFiles.forEach((f,i)=>{
     const item=document.createElement('div');item.className='file-item';
-    item.innerHTML=`<div class="file-order">${i+1}</div><span class="file-name">${f.name}</span><span class="file-size">${fmtSize(f.size)}</span><button class="remove-btn" data-i="${i}">✕</button>`;
+    item.innerHTML=`<div class="file-order">${i+1}</div><span class="file-name">${f.name}</span><span class="file-size">${fmtSize(f.size)}</span><button class="remove-btn" data-i="${i}">\u2715</button>`;
     list.appendChild(item);
   });
   list.querySelectorAll('.remove-btn').forEach(btn=>btn.addEventListener('click',()=>{mergeFiles.splice(+btn.dataset.i,1);renderMergeList();}));
@@ -312,25 +389,27 @@ function renderMergeList(){
 }
 document.getElementById('merge-btn').addEventListener('click',async()=>{
   const btn=document.getElementById('merge-btn');btn.disabled=true;
-  setProgress('merge',10,'Reading files…');
+  setProgress('merge',10,'Reading files\u2026');
   try{
     const merged=await PDFLib.PDFDocument.create();
     for(let i=0;i<mergeFiles.length;i++){
-      setProgress('merge',10+Math.round((i/mergeFiles.length)*80),`Merging ${i+1} of ${mergeFiles.length}…`);
+      setProgress('merge',10+Math.round((i/mergeFiles.length)*80),`Merging ${i+1} of ${mergeFiles.length}\u2026`);
       const doc=await PDFLib.PDFDocument.load(await readFile(mergeFiles[i]));
       const pages=await merged.copyPages(doc,doc.getPageIndices());
       pages.forEach(p=>merged.addPage(p));
     }
-    setProgress('merge',95,'Saving…');
+    setProgress('merge',95,'Saving\u2026');
     const bytes=await merged.save();
     setProgress('merge',100,'Done!');
-    showResult('merge',`${mergeFiles.length} files · ${merged.getPageCount()} pages · ${fmtSize(bytes.length)}`,bytes,document.getElementById('merge-name').value||'merged.pdf');
+    showResult('merge',`${mergeFiles.length} files \xb7 ${merged.getPageCount()} pages \xb7 ${fmtSize(bytes.length)}`,bytes,document.getElementById('merge-name').value||'merged.pdf');
   }catch(e){setProgress('merge',100,'Error: '+e.message);}
   btn.disabled=false;
 });
 
 // ── PDF → IMAGES ──────────────────────────────────────────────────────────────
 let p2iFile=null;
+let p2iDownloadFmt='individual';
+
 document.getElementById('p2i-scale').addEventListener('input',function(){document.getElementById('p2i-scale-val').textContent=this.value+'x';});
 setupDrop('p2i-drop','p2i-input','pdf',files=>{
   if(!files[0])return;p2iFile=files[0];
@@ -339,34 +418,148 @@ setupDrop('p2i-drop','p2i-input','pdf',files=>{
   document.getElementById('p2i-results').innerHTML='';
   document.getElementById('p2i-progress').classList.remove('show');
 });
+
 document.getElementById('p2i-btn').addEventListener('click',async()=>{
   if(!p2iFile)return;
   const btn=document.getElementById('p2i-btn');btn.disabled=true;
-  setProgress('p2i',5,'Loading PDF…');
+  setProgress('p2i',5,'Loading PDF\u2026');
   document.getElementById('p2i-results').innerHTML='';
   try{
     const scale=parseFloat(document.getElementById('p2i-scale').value)||2;
     const pdfDoc=await pdfjsLib.getDocument({data:new Uint8Array(await readFile(p2iFile))}).promise;
     const numPages=pdfDoc.numPages;
+
+    // toolbar
+    const toolbar=document.createElement('div');
+    toolbar.className='p2i-toolbar';
+    toolbar.innerHTML=`
+      <button class="p2i-toolbar-btn" id="p2i-select-all">&#9633; Select All</button>
+      <div class="fmt-group">
+        <button class="fmt-btn active" data-fmt="individual">Individual</button>
+        <button class="fmt-btn" data-fmt="zip">ZIP</button>
+      </div>
+      <button class="p2i-dl-sel" id="p2i-dl-sel-btn" disabled>&#8595; Download (0)</button>
+      <span class="p2i-sel-info" id="p2i-sel-info"></span>
+    `;
+
     const grid=document.createElement('div');grid.className='img-result-grid';
+    const dataUrls=[];
+
     for(let i=1;i<=numPages;i++){
-      setProgress('p2i',Math.round((i/numPages)*90),`Rendering page ${i} of ${numPages}…`);
+      setProgress('p2i',Math.round((i/numPages)*90),`Rendering page ${i} of ${numPages}\u2026`);
       const page=await pdfDoc.getPage(i);
       const viewport=page.getViewport({scale});
       const canvas=document.createElement('canvas');
       canvas.width=viewport.width;canvas.height=viewport.height;
       await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
       const dataUrl=canvas.toDataURL('image/png');
-      const item=document.createElement('div');item.className='img-result-item';
+      dataUrls.push(dataUrl);
+
+      const item=document.createElement('div');item.className='img-result-item';item.dataset.idx=i-1;
+
+      const checkWrap=document.createElement('div');checkWrap.className='img-check-wrap';
+      const cb=document.createElement('input');cb.type='checkbox';cb.className='img-cb';
+      checkWrap.appendChild(cb);
+
       const img=document.createElement('img');img.src=dataUrl;
-      const a=document.createElement('a');a.href=dataUrl;a.download=`page-${i}.png`;a.textContent=`↓ page ${i}`;
-      item.appendChild(img);item.appendChild(a);grid.appendChild(item);
+      const a=document.createElement('a');a.className='img-dl-link';a.href=dataUrl;a.download=`page-${i}.png`;a.textContent=`\u2193 page ${i}`;
+
+      item.appendChild(checkWrap);
+      item.appendChild(img);
+      item.appendChild(a);
+      grid.appendChild(item);
+
+      // clicking the item (not the link) toggles the checkbox
+      item.addEventListener('click',e=>{
+        if(e.target===a||e.target===cb)return;
+        cb.checked=!cb.checked;
+        updateP2IToolbar(grid,toolbar,dataUrls);
+      });
+      cb.addEventListener('change',()=>updateP2IToolbar(grid,toolbar,dataUrls));
     }
-    document.getElementById('p2i-results').appendChild(grid);
-    setProgress('p2i',100,`${numPages} page${numPages===1?'':'s'} rendered — click each to download`);
+
+    const resultsEl=document.getElementById('p2i-results');
+    resultsEl.appendChild(toolbar);
+    resultsEl.appendChild(grid);
+
+    // select-all toggle
+    const selAllBtn=toolbar.querySelector('#p2i-select-all');
+    selAllBtn.addEventListener('click',()=>{
+      const cbs=[...grid.querySelectorAll('.img-cb')];
+      const allChecked=cbs.every(c=>c.checked);
+      cbs.forEach(c=>c.checked=!allChecked);
+      selAllBtn.innerHTML=(!allChecked?'\u2611':'\u2633')+' Select All';
+      updateP2IToolbar(grid,toolbar,dataUrls);
+    });
+
+    // format toggle
+    toolbar.querySelectorAll('.fmt-btn').forEach(fb=>{
+      fb.addEventListener('click',()=>{
+        toolbar.querySelectorAll('.fmt-btn').forEach(b=>b.classList.remove('active'));
+        fb.classList.add('active');
+        p2iDownloadFmt=fb.dataset.fmt;
+        updateP2IToolbar(grid,toolbar,dataUrls);
+      });
+    });
+
+    // download selected
+    toolbar.querySelector('#p2i-dl-sel-btn').addEventListener('click',()=>downloadP2ISelected(grid,dataUrls));
+
+    setProgress('p2i',100,`${numPages} page${numPages===1?'':'s'} rendered`);
+    updateP2IToolbar(grid,toolbar,dataUrls);
   }catch(e){setProgress('p2i',100,'Error: '+e.message);}
   btn.disabled=false;
 });
+
+function updateP2IToolbar(grid,toolbar,dataUrls){
+  const cbs=[...grid.querySelectorAll('.img-cb')];
+  const checked=cbs.filter(c=>c.checked);
+  const dlBtn=toolbar.querySelector('#p2i-dl-sel-btn');
+  const selInfo=toolbar.querySelector('#p2i-sel-info');
+  const selAllBtn=toolbar.querySelector('#p2i-select-all');
+
+  // update selected highlight
+  grid.querySelectorAll('.img-result-item').forEach(item=>{
+    const cb=item.querySelector('.img-cb');
+    item.classList.toggle('selected',cb.checked);
+  });
+
+  const n=checked.length;
+  const fmt=p2iDownloadFmt;
+  dlBtn.disabled=n===0;
+  dlBtn.textContent=`\u2193 Download ${n>0?`(${n})`:''}${fmt==='zip'?' as ZIP':''}`;
+  selInfo.textContent=n>0?`${n} of ${dataUrls.length} selected`:'';
+
+  const allChecked=n===cbs.length&&n>0;
+  selAllBtn.innerHTML=(allChecked?'\u2611':'\u2633')+' Select All';
+}
+
+async function downloadP2ISelected(grid,dataUrls){
+  const items=[...grid.querySelectorAll('.img-result-item')];
+  const selected=items.filter(item=>item.querySelector('.img-cb').checked);
+  if(!selected.length)return;
+
+  if(p2iDownloadFmt==='zip'){
+    const zip=new JSZip();
+    selected.forEach(item=>{
+      const idx=parseInt(item.dataset.idx);
+      const base64=dataUrls[idx].split(',')[1];
+      zip.file(`page-${idx+1}.png`,base64,{base64:true});
+    });
+    const blob=await zip.generateAsync({type:'blob'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='pages.zip';a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+  }else{
+    // individual: trigger each download with a small delay
+    for(let i=0;i<selected.length;i++){
+      const item=selected[i];
+      const idx=parseInt(item.dataset.idx);
+      const a=document.createElement('a');a.href=dataUrls[idx];a.download=`page-${idx+1}.png`;a.click();
+      if(i<selected.length-1)await new Promise(r=>setTimeout(r,120));
+    }
+  }
+}
 
 // ── Canvas PNG converter ──────────────────────────────────────────────────────
 function convertToPngBase64(dataUrl){
@@ -384,7 +577,7 @@ function renderI2PList(){
   const list=document.getElementById('i2p-list');list.innerHTML='';
   i2pFiles.forEach((f,i)=>{
     const item=document.createElement('div');item.className='file-item';
-    item.innerHTML=`<div class="file-order">${i+1}</div><span class="file-name">${f.name}</span><span class="file-size">${fmtSize(f.size)}</span><button class="remove-btn" data-i="${i}">✕</button>`;
+    item.innerHTML=`<div class="file-order">${i+1}</div><span class="file-name">${f.name}</span><span class="file-size">${fmtSize(f.size)}</span><button class="remove-btn" data-i="${i}">\u2715</button>`;
     list.appendChild(item);
   });
   list.querySelectorAll('.remove-btn').forEach(btn=>btn.addEventListener('click',()=>{i2pFiles.splice(+btn.dataset.i,1);renderI2PList();}));
@@ -395,13 +588,13 @@ function renderI2PList(){
 document.getElementById('i2p-btn').addEventListener('click',async()=>{
   if(!i2pFiles.length)return;
   const btn=document.getElementById('i2p-btn');btn.disabled=true;
-  setProgress('i2p',5,'Creating PDF…');
+  setProgress('i2p',5,'Creating PDF\u2026');
   try{
     const doc=await PDFLib.PDFDocument.create();
     const pageSize=document.getElementById('i2p-pagesize').value;
     const A4=[595.28,841.89];const LETTER=[612,792];
     for(let i=0;i<i2pFiles.length;i++){
-      setProgress('i2p',5+Math.round((i/i2pFiles.length)*85),`Embedding image ${i+1} of ${i2pFiles.length}…`);
+      setProgress('i2p',5+Math.round((i/i2pFiles.length)*85),`Embedding image ${i+1} of ${i2pFiles.length}\u2026`);
       const file=i2pFiles[i];const mimeType=file.type;
       let img;
       if(mimeType==='image/png'||mimeType==='image/jpeg'){
@@ -417,10 +610,10 @@ document.getElementById('i2p-btn').addEventListener('click',async()=>{
       const scale=Math.min(pw/iw,ph/ih);
       page.drawImage(img,{x:(pw-iw*scale)/2,y:(ph-ih*scale)/2,width:iw*scale,height:ih*scale});
     }
-    setProgress('i2p',95,'Saving…');
+    setProgress('i2p',95,'Saving\u2026');
     const bytes=await doc.save();
     setProgress('i2p',100,'Done!');
-    showResult('i2p',`${i2pFiles.length} image${i2pFiles.length===1?'':'s'} · ${fmtSize(bytes.length)}`,bytes,document.getElementById('i2p-name').value||'images.pdf');
+    showResult('i2p',`${i2pFiles.length} image${i2pFiles.length===1?'':'s'} \xb7 ${fmtSize(bytes.length)}`,bytes,document.getElementById('i2p-name').value||'images.pdf');
   }catch(e){setProgress('i2p',100,'Error: '+e.message);}
   btn.disabled=false;
 });
