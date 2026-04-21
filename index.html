@@ -12,8 +12,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:1
 nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 2.5rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
 .logo{font-family:var(--serif);font-size:1.5rem;font-weight:600;color:var(--accent);letter-spacing:-.02em}
 .logo span{color:var(--text)}
-.logo-group{display:flex;align-items:baseline;gap:.6rem}
-.visit-count{font-size:.62rem;color:var(--muted);letter-spacing:.05em;opacity:.65;white-space:nowrap}
 .nav-tag{font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
 .hero{padding:5rem 2.5rem 3rem;max-width:960px;margin:0 auto}
 .hero-label{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem}
@@ -140,10 +138,7 @@ footer a:hover{color:var(--accent)}
 </div>
 
 <nav>
-  <div class="logo-group">
-    <div class="logo">PDF<span>box</span></div>
-    <span class="visit-count" id="visit-counter"></span>
-  </div>
+  <div class="logo">PDF<span>box</span></div>
   <div class="nav-tag">100% client-side · no uploads · open source</div>
 </nav>
 
@@ -154,8 +149,8 @@ footer a:hover{color:var(--accent)}
 </div>
 
 <div class="tabs">
-  <button class="tab-btn active" data-tab="split">&#9988; Extract Pages</button>
-  <button class="tab-btn" data-tab="compress">&#9672; Compress</button>
+  <button class="tab-btn active" data-tab="split">&#9986; Extract Pages</button>
+  <button class="tab-btn" data-tab="compress">&#8863; Compress</button>
   <button class="tab-btn" data-tab="merge">&#8853; Merge</button>
   <button class="tab-btn" data-tab="convert">&#8644; Converters</button>
 </div>
@@ -164,7 +159,7 @@ footer a:hover{color:var(--accent)}
 
   <!-- EXTRACT -->
   <div class="panel active" id="tab-split">
-    <div class="drop-zone" id="split-drop"><input type="file" accept=".pdf" id="split-input"><span class="drop-icon">&#9988;</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse &middot; single file</p></div>
+    <div class="drop-zone" id="split-drop"><input type="file" accept=".pdf" id="split-input"><span class="drop-icon">&#9986;</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse &middot; single file</p></div>
     <div class="file-list" id="split-list"></div>
     <div class="controls">
       <div class="control-row"><label class="ctrl-label">Pages</label><input type="text" id="split-pages" placeholder="e.g. 2, 1-3, 5, 7-9"></div>
@@ -178,7 +173,7 @@ footer a:hover{color:var(--accent)}
 
   <!-- COMPRESS -->
   <div class="panel" id="tab-compress">
-    <div class="drop-zone" id="compress-drop"><input type="file" accept=".pdf" id="compress-input"><span class="drop-icon">&#9672;</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse &middot; single file</p></div>
+    <div class="drop-zone" id="compress-drop"><input type="file" accept=".pdf" id="compress-input"><span class="drop-icon">&#8863;</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse &middot; single file</p></div>
     <div class="file-list" id="compress-list"></div>
     <div class="controls">
       <div class="control-row"><label class="ctrl-label">Quality</label><input type="range" id="compress-quality" min="0" max="100" value="75" step="1"><span class="range-val" id="compress-quality-val">75%</span></div>
@@ -209,7 +204,7 @@ footer a:hover{color:var(--accent)}
       <button class="sub-tab-btn" data-sub="img2pdf">Images &rarr; PDF</button>
     </div>
     <div class="sub-panel active" id="sub-pdf2img">
-      <div class="drop-zone" id="p2i-drop"><input type="file" accept=".pdf" id="p2i-input"><span class="drop-icon">&#9638;</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse &middot; exports each page as PNG</p></div>
+      <div class="drop-zone" id="p2i-drop"><input type="file" accept=".pdf" id="p2i-input"><span class="drop-icon">&#9641;</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse &middot; exports each page as PNG</p></div>
       <div class="file-list" id="p2i-file-list"></div>
       <div class="controls">
         <div class="control-row"><label class="ctrl-label">Scale</label><input type="range" id="p2i-scale" min="1" max="4" value="2" step="0.5"><span class="range-val" id="p2i-scale-val">2x</span></div>
@@ -220,7 +215,7 @@ footer a:hover{color:var(--accent)}
       <div id="p2i-results"></div>
     </div>
     <div class="sub-panel" id="sub-img2pdf">
-      <div class="drop-zone" id="i2p-drop"><input type="file" accept="image/jpeg,image/png,image/webp" multiple id="i2p-input"><span class="drop-icon">&#9646;</span><p class="drop-title">Drop images here</p><p class="drop-sub">or click to browse &middot; JPG, PNG and WebP &middot; multiple files</p></div>
+      <div class="drop-zone" id="i2p-drop"><input type="file" accept="image/jpeg,image/png,image/webp" multiple id="i2p-input"><span class="drop-icon">&#9636;</span><p class="drop-title">Drop images here</p><p class="drop-sub">or click to browse &middot; JPG, PNG and WebP &middot; multiple files</p></div>
       <div class="file-list" id="i2p-list"></div>
       <div class="controls">
         <div class="control-row"><label class="ctrl-label">Page size</label>
@@ -237,7 +232,7 @@ footer a:hover{color:var(--accent)}
   <div class="info-row">
     <div class="info-card"><div class="ic-num">0</div><p>Files uploaded to any server. Everything runs in your browser using WebAssembly.</p></div>
     <div class="info-card"><div class="ic-num">&infin;</div><p>Files you can process. No accounts, no limits, no watermarks. Ever.</p></div>
-    <div class="info-card"><div class="ic-num">OS</div><p>Open source on GitHub. Audit the code, fork it, contribute, or self-host it.</p></div>
+    <div class="info-card"><div class="ic-num">&lt;/&gt;</div><p>Open source on GitHub. Audit the code, fork it, contribute, or self-host it.</p></div>
   </div>
 </div>
 
@@ -259,17 +254,6 @@ window.addEventListener('load',()=>{
   sk.classList.add('hide');
   setTimeout(()=>{if(sk.parentNode)sk.parentNode.removeChild(sk);},500);
 });
-
-// ── Visit counter ─────────────────────────────────────────────────────────────
-(function(){
-  try{
-    const key='pdfbox_visits';
-    const n=(parseInt(localStorage.getItem(key)||'0'))+1;
-    localStorage.setItem(key,n);
-    const el=document.getElementById('visit-counter');
-    if(el)el.textContent=n.toLocaleString()+' visit'+(n===1?'':'s');
-  }catch(e){}
-})();
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.tab-btn').forEach(btn=>{
