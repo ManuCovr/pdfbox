@@ -1,50 +1,39 @@
-# MDpad
-A fast, minimal Markdown editor that runs entirely in your browser *(this README was written with it)*.
+# PDFbox
 
-## Features
+## I got tired of sites that make you sign up just to merge two PDFs, so I built this. It's a small browser-based toolkit that handles the PDF tasks I actually run into day to day.
+## What it does
 
-**Editor**
-- Live split-pane preview with resizable divider, plus edit-only and preview-only modes
-- Auto-saves to `localStorage` — content persists across sessions
-- Status bar with word, character, line counts, and cursor position
+- Merge — drag in a bunch of PDFs, reorder them, get one file back
+- Extract Pages — pick specific pages or ranges out of a PDF (e.g. 2, 5-8, 12)
+- Compress — strips metadata and optimizes the file to bring the size down
 
-**Formatting**
-- Keyboard shortcuts: `⌘B` bold, `⌘I` italic, `` ⌘` `` inline code, `⌘1/2/3` headings
-- Right-click context menu on selected text
-- Sidebar with all formatting options organized by category
-- 6 built-in templates (README, Blog post, Meeting notes, Changelog, Tech doc, Daily journal) + save your own
+> Your files stay on your device
+> No uploads. Everything runs in the browser using pdf-lib. I'm not storing anything, and there's no server involved at all
 
-**Command Palette (`⌘K`)**
-- 33 commands across Format, Templates, Clean, View, and Tools groups
-- Fuzzy search with keyboard navigation — formatting commands wrap selected text even after navigating the palette
+## How to use it
 
-**Find & Replace (`⌘F`)**
-- All matches highlighted inline in the editor without stealing focus
-- Navigate matches with `↑` / `↓`, replace one or all at once (case-insensitive)
-- Capped at 1,000 matches to prevent slowdown
+- Open the site, drop your PDF in, done.
 
-**Clean tools** — fix spacing, trim blank lines, title/sentence-case headings, strip to plain text
+> Live site: https://ManuCovr.github.io/pdfbox
 
-**Export** — styled HTML, `.md` file, or copy raw Markdown to clipboard
+---
 
-## Keyboard Shortcuts
+## Running it locally
 
-| Shortcut | Action |
-|----------|--------|
-| `⌘K` | Command palette |
-| `⌘F` | Find & replace |
-| `⌘B` / `⌘I` / `` ⌘` `` | Bold / Italic / Inline code |
-| `⌘1` / `⌘2` / `⌘3` | Heading 1 / 2 / 3 |
-| `Esc` | Close palette / find bar / modal |
+It's a single HTML file, so there's nothing to install or build.
+```
+git clone https://github.com/YOURUSERNAME/pdfbox.git
+cd pdfbox
+npx serve .
+```
 
-## Usage
-Visit [manucovr.github.io/MDpad](https://manucovr.github.io/MDpad/). To self-host, push the repo and enable GitHub Pages from the `main` branch root.
+Or just open > index.html directly in your browser.
 
-## Stack
-Single HTML file — HTML, CSS, and vanilla JS. Only external resources are two Google Fonts (`DM Sans` and `JetBrains Mono`).
+## Built with
+    Vanilla HTML, CSS, JS — no frameworks
+    pdf-lib for all the PDF stuff
 
-## Privacy
-Everything stays in your browser. Content is saved to `localStorage` only — nothing is ever sent anywhere.
-
-## License
-MIT © 2025 Manuel Bernardes
+## Fork it
+    Fork the repo
+    Go to Settings → Pages → deploy from main
+    It'll be live at > https://ManuCovr.github.io/pdfbox
