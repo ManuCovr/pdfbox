@@ -18,15 +18,6 @@
 
 ---
 
-## Page extraction
-> You can mix and match page numbers and ranges:
- 
-2          → just page 2
-1-5        → pages 1 through 5
-2, 10-20   → page 2 and pages 10 through 20
-1, 3, 5-8  → pages 1, 3, and 5 through 8
-
-
 ## Running it locally
 
 It's a single HTML file, so there's nothing to install or build.
