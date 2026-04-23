@@ -5,9 +5,9 @@
 
 ---
 
--     Merge — drag in a bunch of PDFs, reorder them, get one file back
--     Extract Pages — pick specific pages or ranges out of a PDF (e.g. 2, 5-8, 12)
--     Compress — strips metadata and optimizes the file to bring the size down
+- Merge — drag in a bunch of PDFs, reorder them, get one file back
+- Extract Pages — pick specific pages or ranges out of a PDF (e.g. 2, 5-8, 12)
+- Compress — strips metadata and optimizes the file to bring the size down
 
 > Your files stay on your device
 > No uploads. Everything runs in the browser using pdf-lib. I'm not storing anything, and there's no server involved at all
@@ -41,12 +41,10 @@ npx serve .
 Or just open > index.html directly in your browser.
 
 ## Built with
-
     Vanilla HTML, CSS, JS — no frameworks
     pdf-lib for all the PDF stuff
 
 ## Fork it
-
     Fork the repo
     Go to Settings → Pages → deploy from main
     It'll be live at > https://ManuCovr.github.io/pdfbox
