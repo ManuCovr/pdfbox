@@ -3,8 +3,6 @@
 ## I got tired of sites that make you sign up just to merge two PDFs, so I built this. It's a small browser-based toolkit that handles the PDF tasks I actually run into day to day.
 ## What it does
 
----
-
 - Merge — drag in a bunch of PDFs, reorder them, get one file back
 - Extract Pages — pick specific pages or ranges out of a PDF (e.g. 2, 5-8, 12)
 - Compress — strips metadata and optimizes the file to bring the size down
