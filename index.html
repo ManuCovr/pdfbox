@@ -198,7 +198,7 @@ footer a:hover{color:var(--accent)}
     <div class="file-list" id="compress-list"></div>
     <div class="controls">
       <div class="control-row"><label class="ctrl-label">Quality</label><input type="range" id="compress-quality" min="0" max="100" value="75" step="1"><span class="range-val" id="compress-quality-val">75%</span></div>
-      <div class="control-row" style="font-size:.72rem;color:var(--muted);">Lower quality = smaller file. Best for PDFs with many images.</div>
+      <div class="control-row" style="font-size:.72rem;color:var(--muted);">Lower quality = smaller file. Pages are rasterised to JPEG &mdash; ideal for image-heavy PDFs.</div>
       <div class="control-row"><label class="ctrl-label">Output name</label><input type="text" id="compress-name" value="compressed.pdf"></div>
     </div>
     <button class="action-btn" id="compress-btn" disabled>Compress PDF</button>
@@ -208,12 +208,12 @@ footer a:hover{color:var(--accent)}
 
   <!-- MERGE -->
   <div class="panel" id="tab-merge">
-    <div class="drop-zone" id="merge-drop"><input type="file" accept=".pdf" multiple id="merge-input"><span class="drop-icon">&#8853;</span><p class="drop-title">Drop PDFs here</p><p class="drop-sub">or click to browse &middot; multiple files supported</p></div>
+    <div class="drop-zone" id="merge-drop"><input type="file" accept=".pdf,image/jpeg,image/png,image/webp" multiple id="merge-input"><span class="drop-icon">&#8853;</span><p class="drop-title">Drop PDFs or images here</p><p class="drop-sub">or click to browse &middot; PDF, JPG, PNG, WebP &middot; multiple files</p></div>
     <div class="file-list" id="merge-list"></div>
     <div class="controls">
       <div class="control-row"><label class="ctrl-label">Output name</label><input type="text" id="merge-name" value="merged.pdf"></div>
     </div>
-    <button class="action-btn" id="merge-btn" disabled>Merge PDFs</button>
+    <button class="action-btn" id="merge-btn" disabled>Merge Files</button>
     <div class="progress-wrap" id="merge-progress"><div class="progress-bar-bg"><div class="progress-bar" id="merge-bar"></div></div><p class="progress-label" id="merge-progress-label"></p></div>
     <div class="result-box" id="merge-result"><div class="result-info"><strong>Merge complete</strong><span id="merge-result-info"></span></div><a class="download-btn" id="merge-download">&#8595; Download</a></div>
   </div>
@@ -259,7 +259,7 @@ footer a:hover{color:var(--accent)}
 
 <footer>
   <span>PDFbox &mdash; free forever</span>
-  <a href="https://github.com/ManuCovr/pdfbox" target="_blank">GitHub &nearr;</a>
+  <a href="https://github.com/ManuCovr/pdfbox" target="_blank" rel="noopener noreferrer">GitHub &nearr;</a>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
@@ -307,10 +307,13 @@ function makeFileItem(name,size,order){
 function readFile(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsArrayBuffer(file);});}
 function readFileAsDataURL(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(file);});}
 function setProgress(id,pct,label){document.getElementById(id+'-progress').classList.add('show');document.getElementById(id+'-bar').style.width=pct+'%';document.getElementById(id+'-progress-label').textContent=label;}
+const _resultUrls={};
 function showResult(id,info,bytes,filename){
+  if(_resultUrls[id])URL.revokeObjectURL(_resultUrls[id]);
   document.getElementById(id+'-result').classList.add('show');
   document.getElementById(id+'-result-info').textContent=info;
   const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
+  _resultUrls[id]=url;
   const dl=document.getElementById(id+'-download');dl.href=url;dl.download=filename;
 }
 function setupDrop(zoneId,inputId,accept,onFiles){
@@ -319,7 +322,7 @@ function setupDrop(zoneId,inputId,accept,onFiles){
   zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
   zone.addEventListener('drop',e=>{
     e.preventDefault();zone.classList.remove('drag-over');
-    const files=[...e.dataTransfer.files].filter(f=>accept==='pdf'?f.type==='application/pdf':f.type.startsWith('image/'));
+    const files=[...e.dataTransfer.files].filter(f=>{if(accept==='pdf')return f.type==='application/pdf';if(accept==='image')return f.type.startsWith('image/');if(accept==='both')return f.type==='application/pdf'||f.type.startsWith('image/');return true;});
     onFiles(files);
   });
   document.getElementById(inputId).addEventListener('change',e=>onFiles([...e.target.files]));
@@ -333,6 +336,7 @@ setupDrop('split-drop','split-input','pdf',files=>{
   document.getElementById('split-btn').disabled=false;
   document.getElementById('split-result').classList.remove('show');
   document.getElementById('split-progress').classList.remove('show');
+  document.getElementById('split-bar').style.width='0%';
 });
 function parsePageRanges(str,total){
   if(!str.trim())return[...Array(total).keys()];
@@ -347,6 +351,7 @@ document.getElementById('split-btn').addEventListener('click',async()=>{
   try{
     const srcDoc=await PDFLib.PDFDocument.load(await readFile(splitFile));
     const indices=parsePageRanges(document.getElementById('split-pages').value,srcDoc.getPageCount());
+    if(!indices.length)throw new Error('No valid pages found. Check your page range.');
     setProgress('split',60,'Extracting pages\u2026');
     const newDoc=await PDFLib.PDFDocument.create();
     const pages=await newDoc.copyPages(srcDoc,indices);
@@ -367,19 +372,35 @@ setupDrop('compress-drop','compress-input','pdf',files=>{
   document.getElementById('compress-btn').disabled=false;
   document.getElementById('compress-result').classList.remove('show');
   document.getElementById('compress-progress').classList.remove('show');
+  document.getElementById('compress-bar').style.width='0%';
 });
 document.getElementById('compress-btn').addEventListener('click',async()=>{
   if(!compressFile)return;
   const btn=document.getElementById('compress-btn');btn.disabled=true;
-  setProgress('compress',10,'Loading PDF\u2026');
+  setProgress('compress',5,'Loading PDF\u2026');
   try{
-    const doc=await PDFLib.PDFDocument.load(await readFile(compressFile),{updateMetadata:false});
-    doc.setTitle('');doc.setAuthor('');doc.setSubject('');doc.setKeywords([]);doc.setProducer('PDFbox');doc.setCreator('PDFbox');
-    setProgress('compress',75,'Saving\u2026');
-    const bytes=await doc.save({useObjectStreams:true,addDefaultPage:false,objectsPerTick:20});
+    const quality=parseInt(document.getElementById('compress-quality').value)/100;
+    const pdfDoc=await pdfjsLib.getDocument({data:new Uint8Array(await readFile(compressFile))}).promise;
+    const numPages=pdfDoc.numPages;
+    const newDoc=await PDFLib.PDFDocument.create();
+    for(let i=1;i<=numPages;i++){
+      setProgress('compress',5+Math.round((i/numPages)*88),`Compressing page ${i} of ${numPages}\u2026`);
+      const page=await pdfDoc.getPage(i);
+      const viewport=page.getViewport({scale:1.5});
+      const canvas=document.createElement('canvas');
+      canvas.width=viewport.width;canvas.height=viewport.height;
+      await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+      const jpegBase64=canvas.toDataURL('image/jpeg',quality).split(',')[1];
+      const img=await newDoc.embedJpg(jpegBase64);
+      const{width:iw,height:ih}=img;
+      const newPage=newDoc.addPage([iw,ih]);
+      newPage.drawImage(img,{x:0,y:0,width:iw,height:ih});
+    }
+    setProgress('compress',95,'Saving\u2026');
+    const bytes=await newDoc.save();
     setProgress('compress',100,'Done!');
     const orig=compressFile.size;const ratio=((1-bytes.length/orig)*100).toFixed(1);
-    const info=ratio>0?`${fmtSize(orig)} \u2192 ${fmtSize(bytes.length)} (${ratio}% smaller)`:`${fmtSize(bytes.length)} (metadata stripped)`;
+    const info=parseFloat(ratio)>0?`${fmtSize(orig)} \u2192 ${fmtSize(bytes.length)} (${ratio}% smaller)`:`${fmtSize(bytes.length)} (processed)`;
     showResult('compress',info,bytes,document.getElementById('compress-name').value||'compressed.pdf');
   }catch(e){setProgress('compress',100,'Error: '+e.message);}
   btn.disabled=false;
@@ -387,7 +408,7 @@ document.getElementById('compress-btn').addEventListener('click',async()=>{
 
 // ── MERGE ─────────────────────────────────────────────────────────────────────
 let mergeFiles=[];
-setupDrop('merge-drop','merge-input','pdf',files=>{mergeFiles=[...mergeFiles,...files];renderMergeList();});
+setupDrop('merge-drop','merge-input','both',files=>{mergeFiles=[...mergeFiles,...files];renderMergeList();});
 function renderMergeList(){
   const list=document.getElementById('merge-list');list.innerHTML='';
   mergeFiles.forEach((f,i)=>{
@@ -399,6 +420,7 @@ function renderMergeList(){
   document.getElementById('merge-btn').disabled=mergeFiles.length<2;
   document.getElementById('merge-result').classList.remove('show');
   document.getElementById('merge-progress').classList.remove('show');
+  document.getElementById('merge-bar').style.width='0%';
 }
 document.getElementById('merge-btn').addEventListener('click',async()=>{
   const btn=document.getElementById('merge-btn');btn.disabled=true;
@@ -407,9 +429,24 @@ document.getElementById('merge-btn').addEventListener('click',async()=>{
     const merged=await PDFLib.PDFDocument.create();
     for(let i=0;i<mergeFiles.length;i++){
       setProgress('merge',10+Math.round((i/mergeFiles.length)*80),`Merging ${i+1} of ${mergeFiles.length}\u2026`);
-      const doc=await PDFLib.PDFDocument.load(await readFile(mergeFiles[i]));
-      const pages=await merged.copyPages(doc,doc.getPageIndices());
-      pages.forEach(p=>merged.addPage(p));
+      const file=mergeFiles[i];
+      if(file.type==='application/pdf'){
+        const doc=await PDFLib.PDFDocument.load(await readFile(file));
+        const pages=await merged.copyPages(doc,doc.getPageIndices());
+        pages.forEach(p=>merged.addPage(p));
+      }else{
+        const mimeType=file.type;
+        let img;
+        if(mimeType==='image/jpeg'){
+          img=await merged.embedJpg((await readFileAsDataURL(file)).split(',')[1]);
+        }else{
+          const dataUrl=await readFileAsDataURL(file);
+          img=await merged.embedPng(mimeType==='image/png'?dataUrl.split(',')[1]:await convertToPngBase64(dataUrl));
+        }
+        const{width:iw,height:ih}=img;
+        const page=merged.addPage([iw,ih]);
+        page.drawImage(img,{x:0,y:0,width:iw,height:ih});
+      }
     }
     setProgress('merge',95,'Saving\u2026');
     const bytes=await merged.save();
@@ -430,11 +467,13 @@ setupDrop('p2i-drop','p2i-input','pdf',files=>{
   document.getElementById('p2i-btn').disabled=false;
   document.getElementById('p2i-results').innerHTML='';
   document.getElementById('p2i-progress').classList.remove('show');
+  document.getElementById('p2i-bar').style.width='0%';
 });
 
 document.getElementById('p2i-btn').addEventListener('click',async()=>{
   if(!p2iFile)return;
   const btn=document.getElementById('p2i-btn');btn.disabled=true;
+  p2iDownloadFmt='individual';
   setProgress('p2i',5,'Loading PDF\u2026');
   document.getElementById('p2i-results').innerHTML='';
   try{
@@ -597,6 +636,7 @@ function renderI2PList(){
   document.getElementById('i2p-btn').disabled=i2pFiles.length===0;
   document.getElementById('i2p-result').classList.remove('show');
   document.getElementById('i2p-progress').classList.remove('show');
+  document.getElementById('i2p-bar').style.width='0%';
 }
 document.getElementById('i2p-btn').addEventListener('click',async()=>{
   if(!i2pFiles.length)return;
