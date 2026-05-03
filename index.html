@@ -600,17 +600,33 @@ async function downloadP2ISelected(grid,dataUrls){
     });
     const blob=await zip.generateAsync({type:'blob'});
     const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download='pages.zip';a.click();
+    triggerDownload(url,'pages.zip');
     setTimeout(()=>URL.revokeObjectURL(url),60000);
   }else{
-    // individual: trigger each download with a small delay
     for(let i=0;i<selected.length;i++){
-      const item=selected[i];
-      const idx=parseInt(item.dataset.idx);
-      const a=document.createElement('a');a.href=dataUrls[idx];a.download=`page-${idx+1}.png`;a.click();
-      if(i<selected.length-1)await new Promise(r=>setTimeout(r,120));
+      const idx=parseInt(selected[i].dataset.idx);
+      const blobUrl=dataUrlToBlobUrl(dataUrls[idx]);
+      triggerDownload(blobUrl,`page-${idx+1}.png`);
+      setTimeout(()=>URL.revokeObjectURL(blobUrl),60000);
+      if(i<selected.length-1)await new Promise(r=>setTimeout(r,200));
     }
   }
+}
+
+// ── Download helpers (Safari-safe) ───────────────────────────────────────────
+// Safari requires the <a> to be in the live DOM before .click(); detached anchors are ignored.
+function triggerDownload(url,filename){
+  const a=document.createElement('a');a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+// Safari does not reliably honour the download attribute on data: URLs for binary content.
+// Converting to a blob: URL first works consistently across all browsers.
+function dataUrlToBlobUrl(dataUrl){
+  const[header,b64]=dataUrl.split(',');
+  const mime=header.replace('data:','').replace(';base64','');
+  const bin=atob(b64);const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  return URL.createObjectURL(new Blob([bytes],{type:mime}));
 }
 
 // ── Canvas PNG converter ──────────────────────────────────────────────────────
