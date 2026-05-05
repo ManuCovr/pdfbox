@@ -47,13 +47,22 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1.25re
 
 /* ── File list ─────────────────────────────────────────────────────────── */
 .file-list{margin-top:1.25rem;display:flex;flex-direction:column;gap:8px}
-.file-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;display:flex;align-items:center;gap:10px;font-size:.8rem;transition:border-color .15s}
+.file-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;display:flex;align-items:center;gap:10px;font-size:.8rem;transition:border-color .15s,opacity .15s}
 .file-item:hover{border-color:var(--border2)}
 .file-item .file-name{flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .file-item .file-size{color:var(--muted);flex-shrink:0}
 .file-item .remove-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;line-height:1;padding:0 2px;transition:color .15s}
 .file-item .remove-btn:hover{color:var(--danger)}
 .file-order{background:var(--surface2);color:var(--muted);font-size:.7rem;width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.preset-group{display:flex;gap:6px}
+.preset-btn{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;font-size:.78rem;padding:.35rem .75rem;transition:background .15s,border-color .15s,color .15s}
+.preset-btn:hover{border-color:var(--border2);color:var(--text)}
+.preset-btn.active{background:var(--accent);border-color:var(--accent);color:#0a0a0a;font-weight:500}
+.preset-hint{font-size:.72rem;color:var(--muted)}
+.drag-handle{color:var(--muted);cursor:grab;font-size:1rem;line-height:1;flex-shrink:0;user-select:none;padding:0 2px}
+.drag-handle:active{cursor:grabbing}
+.file-item.dragging{opacity:.35}
+.file-item.drag-over{border-color:var(--accent);background:var(--surface2)}
 
 /* ── Controls ──────────────────────────────────────────────────────────── */
 .controls{margin-top:1.5rem;display:flex;flex-direction:column;gap:1rem}
@@ -197,8 +206,8 @@ footer a:hover{color:var(--accent)}
     <div class="drop-zone" id="compress-drop"><input type="file" accept=".pdf" id="compress-input"><span class="drop-icon">&#8863;</span><p class="drop-title">Drop a PDF here</p><p class="drop-sub">or click to browse &middot; single file</p></div>
     <div class="file-list" id="compress-list"></div>
     <div class="controls">
-      <div class="control-row"><label class="ctrl-label">Quality</label><input type="range" id="compress-quality" min="0" max="100" value="75" step="1"><span class="range-val" id="compress-quality-val">75%</span></div>
-      <div class="control-row" style="font-size:.72rem;color:var(--muted);">Lower quality = smaller file. Pages are rasterised to JPEG &mdash; ideal for image-heavy PDFs.</div>
+      <div class="control-row"><label class="ctrl-label">Level</label><div class="preset-group" id="compress-preset-group"><button class="preset-btn active" data-preset="low">Low</button><button class="preset-btn" data-preset="medium">Medium</button><button class="preset-btn" data-preset="high">High</button></div></div>
+      <div class="control-row preset-hint" id="compress-hint">Lossless &mdash; strips metadata &amp; recompresses streams. Safe for all PDFs, no quality loss.</div>
       <div class="control-row"><label class="ctrl-label">Output name</label><input type="text" id="compress-name" value="compressed.pdf"></div>
     </div>
     <button class="action-btn" id="compress-btn" disabled>Compress PDF</button>
@@ -365,10 +374,23 @@ document.getElementById('split-btn').addEventListener('click',async()=>{
 
 // ── COMPRESS ──────────────────────────────────────────────────────────────────
 let compressFile=null;
-document.getElementById('compress-quality').addEventListener('input',function(){document.getElementById('compress-quality-val').textContent=this.value+'%';});
+let compressPreset='low';
+const compressPresetHints={
+  low:'Lossless — strips metadata & recompresses streams. Safe for all PDFs, no quality loss.',
+  medium:'Re-renders pages as JPEG at 85% resolution. Good balance for scanned or image-heavy PDFs.',
+  high:'Aggressive JPEG at 55% resolution. Smallest output, some quality loss on text-heavy PDFs.',
+};
+document.getElementById('compress-preset-group').querySelectorAll('.preset-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#compress-preset-group .preset-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    compressPreset=btn.dataset.preset;
+    document.getElementById('compress-hint').textContent=compressPresetHints[compressPreset];
+  });
+});
 setupDrop('compress-drop','compress-input','pdf',files=>{
   if(!files[0])return;compressFile=files[0];
-  const cl=document.getElementById('compress-list');cl.innerHTML='';cl.appendChild(makeFileItem(compressFile.name,compressFile.size));
+  const cl=document.getElementById('compress-list');cl.replaceChildren();cl.appendChild(makeFileItem(compressFile.name,compressFile.size));
   document.getElementById('compress-btn').disabled=false;
   document.getElementById('compress-result').classList.remove('show');
   document.getElementById('compress-progress').classList.remove('show');
@@ -377,31 +399,45 @@ setupDrop('compress-drop','compress-input','pdf',files=>{
 document.getElementById('compress-btn').addEventListener('click',async()=>{
   if(!compressFile)return;
   const btn=document.getElementById('compress-btn');btn.disabled=true;
-  setProgress('compress',5,'Loading PDF\u2026');
+  setProgress('compress',5,'Loading PDF…');
   try{
-    const quality=parseInt(document.getElementById('compress-quality').value)/100;
-    const pdfDoc=await pdfjsLib.getDocument({data:new Uint8Array(await readFile(compressFile))}).promise;
-    const numPages=pdfDoc.numPages;
-    const newDoc=await PDFLib.PDFDocument.create();
-    for(let i=1;i<=numPages;i++){
-      setProgress('compress',5+Math.round((i/numPages)*88),`Compressing page ${i} of ${numPages}\u2026`);
-      const page=await pdfDoc.getPage(i);
-      const viewport=page.getViewport({scale:1.5});
-      const canvas=document.createElement('canvas');
-      canvas.width=viewport.width;canvas.height=viewport.height;
-      await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
-      const jpegBase64=canvas.toDataURL('image/jpeg',quality).split(',')[1];
-      const img=await newDoc.embedJpg(jpegBase64);
-      const{width:iw,height:ih}=img;
-      const newPage=newDoc.addPage([iw,ih]);
-      newPage.drawImage(img,{x:0,y:0,width:iw,height:ih});
+    const originalBytes=new Uint8Array(await readFile(compressFile));
+    const orig=compressFile.size;
+    let outBytes;
+    if(compressPreset==='low'){
+      setProgress('compress',40,'Optimising streams…');
+      const doc=await PDFLib.PDFDocument.load(originalBytes);
+      doc.setTitle('');doc.setAuthor('');doc.setSubject('');doc.setKeywords([]);doc.setCreator('PDFbox');doc.setProducer('');
+      setProgress('compress',80,'Saving…');
+      outBytes=await doc.save();
+    }else{
+      const cfg=compressPreset==='medium'?{scale:0.85,quality:0.72}:{scale:0.55,quality:0.45};
+      const pdfDoc=await pdfjsLib.getDocument({data:originalBytes.slice(0)}).promise;
+      const numPages=pdfDoc.numPages;
+      const newDoc=await PDFLib.PDFDocument.create();
+      for(let i=1;i<=numPages;i++){
+        setProgress('compress',5+Math.round((i/numPages)*88),`Compressing page ${i} of ${numPages}…`);
+        const page=await pdfDoc.getPage(i);
+        const viewport=page.getViewport({scale:cfg.scale});
+        const canvas=document.createElement('canvas');
+        canvas.width=viewport.width;canvas.height=viewport.height;
+        await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+        const jpegBase64=canvas.toDataURL('image/jpeg',cfg.quality).split(',')[1];
+        const img=await newDoc.embedJpg(jpegBase64);
+        const{width:iw,height:ih}=img;
+        const newPage=newDoc.addPage([iw,ih]);
+        newPage.drawImage(img,{x:0,y:0,width:iw,height:ih});
+      }
+      setProgress('compress',95,'Saving…');
+      outBytes=await newDoc.save();
     }
-    setProgress('compress',95,'Saving\u2026');
-    const bytes=await newDoc.save();
+    const final=outBytes.length<orig?outBytes:originalBytes;
     setProgress('compress',100,'Done!');
-    const orig=compressFile.size;const ratio=((1-bytes.length/orig)*100).toFixed(1);
-    const info=parseFloat(ratio)>0?`${fmtSize(orig)} \u2192 ${fmtSize(bytes.length)} (${ratio}% smaller)`:`${fmtSize(bytes.length)} (processed)`;
-    showResult('compress',info,bytes,document.getElementById('compress-name').value||'compressed.pdf');
+    const ratio=((1-final.length/orig)*100).toFixed(1);
+    const info=parseFloat(ratio)>0
+      ?`${fmtSize(orig)} → ${fmtSize(final.length)} (${ratio}% smaller)`
+      :`${fmtSize(orig)} — already fully optimised`;
+    showResult('compress',info,final,document.getElementById('compress-name').value||'compressed.pdf');
   }catch(e){setProgress('compress',100,'Error: '+e.message);}
   btn.disabled=false;
 });
@@ -410,10 +446,27 @@ document.getElementById('compress-btn').addEventListener('click',async()=>{
 let mergeFiles=[];
 setupDrop('merge-drop','merge-input','both',files=>{mergeFiles=[...mergeFiles,...files];renderMergeList();});
 function renderMergeList(){
-  const list=document.getElementById('merge-list');list.innerHTML='';
+  const list=document.getElementById('merge-list');
+  list.replaceChildren();
+  let dragSrc=null;
   mergeFiles.forEach((f,i)=>{
     const item=makeFileItem(f.name,f.size,i+1);
+    item.draggable=true;
+    item.dataset.i=i;
+    const handle=document.createElement('span');handle.className='drag-handle';handle.textContent='⠇';handle.title='Drag to reorder';
+    item.insertBefore(handle,item.firstChild);
     const rb=document.createElement('button');rb.className='remove-btn';rb.dataset.i=i;rb.textContent='✕';item.appendChild(rb);
+    item.addEventListener('dragstart',e=>{dragSrc=i;e.dataTransfer.effectAllowed='move';item.classList.add('dragging');});
+    item.addEventListener('dragend',()=>{list.querySelectorAll('.file-item').forEach(el=>el.classList.remove('dragging','drag-over'));});
+    item.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';item.classList.add('drag-over');});
+    item.addEventListener('dragleave',()=>item.classList.remove('drag-over'));
+    item.addEventListener('drop',e=>{
+      e.preventDefault();
+      if(dragSrc===null||dragSrc===i)return;
+      const moved=mergeFiles.splice(dragSrc,1)[0];
+      mergeFiles.splice(i,0,moved);
+      renderMergeList();
+    });
     list.appendChild(item);
   });
   list.querySelectorAll('.remove-btn').forEach(btn=>btn.addEventListener('click',()=>{mergeFiles.splice(+btn.dataset.i,1);renderMergeList();}));

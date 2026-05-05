@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:bigpdf.11zon.com)",
+      "Bash(git checkout *)",
+      "Bash(python3 *)"
+    ]
+  }
+}
